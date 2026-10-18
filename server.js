@@ -38,6 +38,38 @@ function fetchUrl(url) {
   });
 }
 
+const HTML_ENTITIES = {
+  '&Agrave;': 'À', '&Aacute;': 'Á', '&Acirc;': 'Â', '&Atilde;': 'Ã', '&Auml;': 'Ä', '&Aring;': 'Å', '&AElig;': 'Æ',
+  '&Ccedil;': 'Ç',
+  '&Egrave;': 'È', '&Eacute;': 'É', '&Ecirc;': 'Ê', '&Euml;': 'Ë',
+  '&Igrave;': 'Ì', '&Iacute;': 'Í', '&Icirc;': 'Î', '&Iuml;': 'Ï',
+  '&Ntilde;': 'Ñ',
+  '&Ograve;': 'Ò', '&Oacute;': 'Ó', '&Ocirc;': 'Ô', '&Otilde;': 'Õ', '&Ouml;': 'Ö', '&Oslash;': 'Ø', '&OElig;': 'Œ',
+  '&Ugrave;': 'Ù', '&Uacute;': 'Ú', '&Ucirc;': 'Û', '&Uuml;': 'Ü',
+  '&Yacute;': 'Ý', '&Yuml;': 'Ÿ',
+  '&agrave;': 'à', '&aacute;': 'á', '&acirc;': 'â', '&atilde;': 'ã', '&auml;': 'ä', '&aring;': 'å', '&aelig;': 'æ',
+  '&ccedil;': 'ç',
+  '&egrave;': 'è', '&eacute;': 'é', '&ecirc;': 'ê', '&euml;': 'ë',
+  '&igrave;': 'ì', '&iacute;': 'í', '&icirc;': 'î', '&iuml;': 'ï',
+  '&ntilde;': 'ñ',
+  '&ograve;': 'ò', '&oacute;': 'ó', '&ocirc;': 'ô', '&otilde;': 'õ', '&ouml;': 'ö', '&oslash;': 'ø', '&oelig;': 'œ',
+  '&ugrave;': 'ù', '&uacute;': 'ú', '&ucirc;': 'û', '&uuml;': 'ü',
+  '&yacute;': 'ý', '&yuml;': 'ÿ',
+  '&rsquo;': "'", '&lsquo;': "'", '&sbquo;': "'",
+  '&rdquo;': '"', '&ldquo;': '"', '&bdquo;': '"',
+  '&bull;': '•', '&hellip;': '…', '&prime;': '′', '&Prime;': '″',
+  '&ndash;': '–', '&mdash;': '—',
+  '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&apos;': "'", '&nbsp;': ' '
+};
+
+function decodeHtmlEntities(str) {
+  if (!str) return '';
+  return str
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(parseInt(dec, 10)))
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+    .replace(/&[a-zA-Z]+;/g, match => HTML_ENTITIES[match] || match);
+}
+
 // Extraction des données stockées dans la balise .js-store d'Ultimate Guitar
 function extractStoreData(html) {
   const marker = 'class="js-store" data-content="';
@@ -85,8 +117,8 @@ app.get('/api/search', async (req, res) => {
       .map(item => ({
         //id: Buffer.from(item.tab_url).toString('base64url'),
         id: Buffer.from(item.tab_url).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, ''),
-        title: item.song_name,
-        artist: item.artist_name || 'Artiste inconnu',
+        title: decodeHtmlEntities(item.song_name),
+        artist: decodeHtmlEntities(item.artist_name || 'Artiste inconnu'),
         type: item.type,
         rating: item.rating ? item.rating.toFixed(1) : null,
         votes: item.votes || 0,
@@ -139,8 +171,8 @@ app.get('/api/song/:id', async (req, res) => {
 
     const song = {
       id: encodedId,
-      title: tabInfo.song_name || 'Sans titre',
-      artist: tabInfo.artist_name || 'Artiste inconnu',
+      title: decodeHtmlEntities(tabInfo.song_name || 'Sans titre'),
+      artist: decodeHtmlEntities(tabInfo.artist_name || 'Artiste inconnu'),
       key: tabData.meta ? (tabData.meta.tonality || '') : '',
       content: content
     };
