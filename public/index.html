@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accords &amp; Paroles - Lecteur &amp; Transposeur</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-container">
+      <h1>ChordViewer</h1>
+      <form id="search-form" class="search-form">
+        <input type="text" id="search-input" placeholder="Rechercher par titre ou artiste (ex: Let it be)..." required autocomplete="off">
+        <button type="submit" id="search-btn">Rechercher</button>
+      </form>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <section id="search-results-section" class="search-results-section hidden">
+      <h2>Résultats de recherche</h2>
+      <ul id="results-list" class="results-list"></ul>
+    </section>
+
+    <section id="player-section" class="player-section hidden">
+      <div class="song-meta">
+        <div>
+          <h2 id="song-title">Titre</h2>
+          <h3 id="song-artist">Artiste</h3>
+        </div>
+        <div class="controls-panel">
+          <div class="control-group">
+            <span class="control-label">Transposition :</span>
+            <button id="transpose-down" class="btn btn-secondary">-1</button>
+            <span id="transpose-offset" class="offset-display">0</span>
+            <button id="transpose-up" class="btn btn-secondary">+1</button>
+            <button id="transpose-reset" class="btn btn-secondary">Reset</button>
+          </div>
+          <div class="control-group">
+            <span class="control-label">Défilement auto :</span>
+            <button id="scroll-toggle" class="btn btn-primary">Démarrer</button>
+            <label for="scroll-speed" class="control-label">Vitesse :</label>
+            <input type="range" id="scroll-speed" min="1" max="10" value="3">
+            <span id="speed-display">3</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chord-display-container">
+        <pre id="chord-display" class="chord-display"></pre>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

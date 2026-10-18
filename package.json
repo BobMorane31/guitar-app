@@ -1,0 +1,18 @@
+{
+  "name": "chord-viewer-app",
+  "version": "1.0.0",
+  "description": "Application web de recherche, visualisation, transposition et défilement d'accords",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test-proxy.js",
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:stop": "pm2 stop chord-viewer",
+    "pm2:restart": "pm2 restart chord-viewer",
+    "pm2:logs": "pm2 logs chord-viewer"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}
