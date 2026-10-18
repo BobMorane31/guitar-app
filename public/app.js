@@ -79,6 +79,20 @@ function escapeHtml(string) {
   return String(string).replace(/[&<>"']/g, s => entityMap[s]);
 }
 
+function renderRatingStars(rating, votes) {
+  if (!rating || parseFloat(rating) === 0) {
+    return '<span style="color: #777;">Aucune note</span>';
+  }
+
+  const numericRating = parseFloat(rating);
+  const roundedStars = Math.round(numericRating);
+  const fullStars = '★'.repeat(Math.min(5, Math.max(0, roundedStars)));
+  const emptyStars = '☆'.repeat(Math.max(0, 5 - roundedStars));
+  const votesText = votes ? ` (${votes})` : '';
+
+  return `<span style="color: #ffb703;" title="${escapeHtml(rating)}/5">${fullStars}${emptyStars}</span> <span style="font-size: 0.85em; color: #a0a0a0;">${escapeHtml(rating)}${votesText}</span>`;
+}
+
 function updateDisplay() {
   if (!currentSong) return;
   chordDisplay.innerHTML = renderSheet(currentSong.content, currentOffset);
@@ -105,7 +119,7 @@ searchForm.addEventListener('submit', async (e) => {
             <div class="result-title">${escapeHtml(song.title)}</div>
             <div class="result-artist">${escapeHtml(song.artist)}</div>
           </div>
-          <div>Tonalité: <strong>${escapeHtml(song.key || 'N/A')}</strong></div>
+          <div>${renderRatingStars(song.rating, song.votes)}</div>
         `;
         li.addEventListener('click', () => loadSong(song.id));
         resultsList.appendChild(li);
