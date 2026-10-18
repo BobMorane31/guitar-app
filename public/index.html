@@ -3,16 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Accords &amp; Paroles - Lecteur &amp; Transposeur</title>
+  <title>Guitar Lab</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="app-header">
     <div class="header-container">
-      <h1>ChordViewer</h1>
+      <h1>Guitar Lab</h1>
       <form id="search-form" class="search-form">
         <input type="text" id="search-input" placeholder="Rechercher par titre ou artiste (ex: Let it be)..." required autocomplete="off">
-        <button type="submit" id="search-btn">Rechercher</button>
+        <button type="submit" id="search-btn" class="btn btn-primary">Rechercher</button>
+        <div class="toggle-filter" role="group" aria-label="Filtrer par type">
+          <button type="button" class="toggle-btn active" data-type="Chords">Chords</button>
+          <button type="button" class="toggle-btn" data-type="Tabs">Tabs</button>
+        </div>
       </form>
     </div>
   </header>

@@ -9,6 +9,8 @@ let scrollSpeed = 3;
 let scrollAnimationFrame = null;
 let lastScrollTimestamp = null;
 let scrollSubpixelRemainder = 0;
+let currentTypeFilter = 'Chords';
+let lastSearchResults = [];
 
 // Éléments du DOM
 const searchForm = document.getElementById('search-form');
@@ -26,6 +28,7 @@ const transposeOffsetDisplay = document.getElementById('transpose-offset');
 const scrollToggleBtn = document.getElementById('scroll-toggle');
 const scrollSpeedSlider = document.getElementById('scroll-speed');
 const speedDisplay = document.getElementById('speed-display');
+const toggleFilterButtons = document.querySelectorAll('.toggle-filter .toggle-btn');
 
 // Fonction pour transposer un nom d'accord donné d'un demi-ton
 function transposeChord(chord, semitones) {
@@ -99,6 +102,46 @@ function updateDisplay() {
   transposeOffsetDisplay.textContent = (currentOffset > 0 ? `+${currentOffset}` : currentOffset);
 }
 
+function renderSearchResults() {
+  resultsList.innerHTML = '';
+  const filtered = lastSearchResults.filter(song => song.type === currentTypeFilter);
+
+  if (filtered.length > 0) {
+    filtered.forEach(song => {
+      const li = document.createElement('li');
+      li.className = 'result-item';
+      li.innerHTML = `
+        <div>
+          <div class="result-title">${escapeHtml(song.title)}</div>
+          <div class="result-artist">${escapeHtml(song.artist)}</div>
+        </div>
+        <div>${renderRatingStars(song.rating, song.votes)}</div>
+      `;
+      li.addEventListener('click', () => loadSong(song.id));
+      resultsList.appendChild(li);
+    });
+    resultsSection.classList.remove('hidden');
+  } else if (lastSearchResults.length > 0) {
+    resultsList.innerHTML = `<li style="color: #a0a0a0;">Aucun résultat de type "${currentTypeFilter}" pour cette recherche.</li>`;
+    resultsSection.classList.remove('hidden');
+  } else {
+    resultsList.innerHTML = '<li style="color: #a0a0a0;">Aucun morceau trouvé.</li>';
+    resultsSection.classList.remove('hidden');
+  }
+}
+
+// Gestion des boutons de filtre Chords / Tabs
+toggleFilterButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const selectedType = btn.dataset.type;
+    if (selectedType === currentTypeFilter) return;
+
+    currentTypeFilter = selectedType;
+    toggleFilterButtons.forEach(b => b.classList.toggle('active', b.dataset.type === currentTypeFilter));
+    renderSearchResults();
+  });
+});
+
 // Gestion de la recherche
 searchForm.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -109,26 +152,8 @@ searchForm.addEventListener('submit', async (e) => {
     const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
     const data = await res.json();
 
-    resultsList.innerHTML = '';
-    if (data.results && data.results.length > 0) {
-      data.results.forEach(song => {
-        const li = document.createElement('li');
-        li.className = 'result-item';
-        li.innerHTML = `
-          <div>
-            <div class="result-title">${escapeHtml(song.title)}</div>
-            <div class="result-artist">${escapeHtml(song.artist)}</div>
-          </div>
-          <div>${renderRatingStars(song.rating, song.votes)}</div>
-        `;
-        li.addEventListener('click', () => loadSong(song.id));
-        resultsList.appendChild(li);
-      });
-      resultsSection.classList.remove('hidden');
-    } else {
-      resultsList.innerHTML = '<li style="color: #a0a0a0;">Aucun morceau trouvé.</li>';
-      resultsSection.classList.remove('hidden');
-    }
+    lastSearchResults = data.results || [];
+    renderSearchResults();
   } catch (err) {
     console.error("Erreur de recherche :", err);
   }
